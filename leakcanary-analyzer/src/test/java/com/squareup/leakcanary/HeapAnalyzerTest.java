@@ -73,6 +73,57 @@ public class HeapAnalyzerTest {
     assertFalse(result.leakFound);
   }
 
+  @Test public void repro() throws Exception {
+    ExcludedRefs.Builder excluded = new ExcludedRefs.Builder();
+    excluded.instanceField("android.app.ActivityThread$ActivityClientRecord", "nextIdle");
+    excluded.instanceField("android.widget.Editor$EasyEditSpanController", "this$0");
+    excluded.instanceField("android.widget.Editor$SpanController", "this$0");
+    excluded.staticField("android.media.session.MediaSessionLegacyHelper", "sInstance");
+    excluded.staticField("android.text.TextLine", "sCached");
+    excluded.instanceField("android.os.Message", "obj");
+    excluded.instanceField("android.os.Message", "next");
+    excluded.instanceField("android.os.Message", "target");
+    excluded.instanceField("android.view.inputmethod.InputMethodManager", "mNextServedView");
+    excluded.instanceField("android.view.inputmethod.InputMethodManager", "mServedView");
+    excluded.instanceField("android.view.inputmethod.InputMethodManager",
+        "mServedInputConnection");
+    excluded.instanceField("android.view.inputmethod.InputMethodManager", "mCurRootView");
+    excluded.instanceField("android.animation.LayoutTransition$1", "val$parent");
+    excluded.instanceField("android.view.textservice.SpellCheckerSession$1", "this$0");
+    excluded.staticField("android.support.v7.internal.widget.ActivityChooserModel",
+        "mActivityChoserModelPolicy");
+    excluded.staticField("android.widget.ActivityChooserModel", "mActivityChoserModelPolicy");
+    excluded.instanceField("android.speech.SpeechRecognizer$InternalListener", "this$0");
+    excluded.instanceField("android.accounts.AccountManager$AmsTask$Response", "this$1");
+    excluded.instanceField("android.media.MediaScannerConnection", "mContext");
+    excluded.instanceField("android.os.UserManager", "mContext");
+    excluded.instanceField("android.app.admin.DevicePolicyManager$SettingsObserver", "this$0");
+    excluded.staticField("com.samsung.android.smartclip.SpenGestureManager", "mContext");
+    excluded.staticField("android.sec.clipboard.ClipboardUIManager", "sInstance");
+    excluded.staticField("android.widget.BubblePopupHelper", "sHelper");
+    excluded.staticField("com.android.org.chromium.android_webview.AwResource", "sResources");
+    excluded.instanceField("com.nvidia.ControllerMapper.MapperClient$ServiceClient", "this$0");
+    excluded.staticField("android.widget.TextView", "mLastHoveredView");
+    excluded.instanceField("android.os.PersonaManager", "mContext");
+    excluded.instanceField("android.content.res.Resources", "mContext");
+    excluded.instanceField("android.view.ViewConfiguration", "mContext");
+    excluded.staticField("android.media.AudioManager", "mContext_static");
+    excluded.thread("FinalizerWatchdogDaemon");
+    excluded.thread("main");
+    excluded.thread("LeakCanary-Heap-Dump");
+    excluded.instanceField("android.view.Choreographer.FrameDisplayEventReceiver",
+        "mMessageQueue");
+    excluded.instanceField("android.app.ActivityThread$ActivityClientRecord", "nextIdle");
+
+
+    HeapAnalyzer heapAnalyzer = new HeapAnalyzer(excluded.build());
+    File heapDumpFile = new File("/Users/py/dev/leakcanary/leakcanary-analyzer/src/test/resources/heap_dump_0.hprof");
+    AnalysisResult result =
+        heapAnalyzer.checkForLeak(heapDumpFile, "ee5aac58-f9ad-4b50-86b7-0d0ce10a1f1e");
+
+    throw result.failure;
+  }
+
   private AnalysisResult analyze(HeapAnalyzer heapAnalyzer) {
     File heapDumpFile = new File(Thread.currentThread()
         .getContextClassLoader()
